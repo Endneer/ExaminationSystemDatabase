@@ -19,8 +19,9 @@ create table Instructor
 	Name nvarchar(50),
 	Degree nvarchar(50),
 	Salary money,
-	Department int not null references Department(ID)
+	Department int not null references Department(ID) 
 )
+
 
 create table Course
 (
@@ -33,7 +34,7 @@ create table Topic
 (
 	ID int not null identity,
 	Name nvarchar(20),
-	Course int not null references Course(ID),
+	Course int not null references Course(ID) on delete cascade,
 	primary key(ID, Course)
 )
 
@@ -124,7 +125,7 @@ go
 -- Course table Procedures
 
 --1)
-ALTER PROCEDURE UpdateCourse  @ID INT , @CurseName nvarchar(50)
+CREATE PROCEDURE UpdateCourse  @ID INT , @CurseName nvarchar(50)
 
   AS
   if not exists ( select ID from Course where ID= @ID)
@@ -137,7 +138,7 @@ ALTER PROCEDURE UpdateCourse  @ID INT , @CurseName nvarchar(50)
     END
 	go
 --2)
-ALTER PROCEDURE DeleteCourse @ID INT
+CREATE PROCEDURE DeleteCourse @ID INT
   AS
    if not exists ( select ID from Course where ID= @ID)
   print 'error'	
@@ -158,7 +159,7 @@ AS
 	go
 
 --4)
-ALTER PROCEDURE SelectCourse @id int
+CREATE PROCEDURE SelectCourse @id int
 AS
 if not exists ( select ID from Course where ID= @id)
   print 'error'	
@@ -187,7 +188,7 @@ if not exists ( select ID from Course where ID= @id)
 ------------------------------------------------------------------------------------------------
 --Question table Procedures
 --1)
-ALTER PROCEDURE UpdateQuestion  @ID INT  , @body varchar(200) 
+CREATE PROCEDURE UpdateQuestion  @ID INT  , @body varchar(200) 
   AS
   if not exists ( select ID from Question where ID= @ID)
   print 'error'	
@@ -200,7 +201,7 @@ ALTER PROCEDURE UpdateQuestion  @ID INT  , @body varchar(200)
 	go
 
 --2)
-ALTER PROCEDURE DeleteQuestion @ID INT
+CREATE PROCEDURE DeleteQuestion @ID INT
   AS
    if not exists ( select ID from Question where ID= @ID)
   print 'error'	
@@ -212,7 +213,7 @@ ALTER PROCEDURE DeleteQuestion @ID INT
 
 --3)
 
-ALTER PROCEDURE InsertQuestion   @type varchar(20), @body varchar(200), @modelanswer nchar(1) , @grade int  , @course int 
+CREATE PROCEDURE InsertQuestion   @type varchar(20), @body varchar(200), @modelanswer nchar(1) , @grade int  , @course int 
 AS
 	BEGIN
 			insert into Question 
@@ -222,7 +223,7 @@ go
 
 --4)
 
-ALTER PROCEDURE SelectQuestion @id int
+CREATE PROCEDURE SelectQuestion @id int
 AS
  if not exists ( select ID from Question where ID= @id)
   print 'error'	
@@ -250,7 +251,7 @@ AS
 --Topic  table Procedures
 
 --1)
-ALTER PROCEDURE UpdateTopic  @ID INT  , @Name  nvarchar(20) 
+CREATE PROCEDURE UpdateTopic  @ID INT  , @Name  nvarchar(20) 
   AS
    if not exists ( select ID from Topic where ID= @id)
   print 'error'	
@@ -264,7 +265,7 @@ ALTER PROCEDURE UpdateTopic  @ID INT  , @Name  nvarchar(20)
 	go
 
 --2)
-ALTER PROCEDURE DeleteTopic @ID INT
+CREATE PROCEDURE DeleteTopic @ID INT
   AS
    if not exists ( select ID from Topic where ID= @ID)
   print 'error'	
@@ -276,7 +277,7 @@ ALTER PROCEDURE DeleteTopic @ID INT
 
 --3)
 
-ALTER PROCEDURE InsertTopic   @name nvarchar(20) , @course int  
+CREATE PROCEDURE InsertTopic   @name nvarchar(20) , @course int  
 AS
 	BEGIN
 			insert into Topic 
@@ -286,7 +287,7 @@ go
 
 --4)
 
-ALTER PROCEDURE SelectTopic  @id int
+CREATE PROCEDURE SelectTopic  @id int
 AS
  if not exists ( select ID from Topic where ID= @id)
   print 'error'	
@@ -312,7 +313,7 @@ CREATE PROCEDURE UpdateSudentCourse  @Student INT , @Course int , @Grade  int
 	go
 
 --2)
-ALTER PROCEDURE DeleteStudentCourses  @Student INT , @course int
+CREATE PROCEDURE DeleteStudentCourses  @Student INT , @course int
   AS
   if not exists ( select Grade from StudentCourses WHERE Student = @Student and Course = @Course)
   print 'error'	
@@ -334,7 +335,7 @@ go
 
 --4)
 
-ALTER PROCEDURE SelectStudentCourses  @Student int , @Course int 
+CREATE PROCEDURE SelectStudentCourses  @Student int , @Course int 
 AS
 if not exists ( select Grade from StudentCourses WHERE Student = @Student and Course = @Course)
   print 'error'	
@@ -398,7 +399,49 @@ end
 
 go
 
+-------------------------------------
+--StudentAnswer Procedure
+--1)
 
+create procedure SelectStudentAnswer (@student int , @question int , @exam int)
+as
+begin
+select Answer from StudentAnswers where Student=@student and Question=@question and Exam=@exam
+end
+go
+
+
+--2)
+create procedure InsertStudentAnswer (@student int , @question int , @exam int,@answer nchar(1))
+as begin
+
+if exists(select * from Student where ID=@student) and 
+exists (select * from Question where ID=@question) and
+exists (select * from Exam where ID=@exam)
+insert into StudentAnswers values(@student,@exam,@question,@answer)
+else 
+print 'can not insert'
+
+end
+go
+
+--3)
+create procedure UpdateStudentAnswer (@student int , @question int , @exam int,@answer nchar(1))
+as
+begin
+
+update StudentAnswers set Answer=@answer where Student=@student and Question=@question and Answer=@answer
+
+end
+go
+
+--4)
+create procedure DeleteStudentAnswer (@student int , @question int , @exam int)
+as
+begin
+delete from StudentAnswers where Student=@student and Question=@question and Exam=@exam
+end
+go
 
 
 
@@ -406,6 +449,7 @@ go
 
 
 ----Some inserts
+
 insert into Department values 
 	('SD', 'System Development', 'Smart Village'),
 	('Java', 'Java Technologies', 'Smart Village')
@@ -414,6 +458,12 @@ insert into Course values
 	('C#', 12),
 	('SQL', 7)
 
+insert into Topic values
+('Events',1),
+('Delegate',1),
+('Lamda Expression',1),
+('Procedure',2)
+
 insert into Student values
 	('Kerollos', 'Talaat', 'Giza', 1),
 	('Muhammad', 'Osama', 'October', 1),
@@ -421,6 +471,5 @@ insert into Student values
 	('John', 'Emad', 'Cairo', 2),
 	('Ahmed', 'Adel', 'Giza', 1)
 go
-
 
 
