@@ -120,28 +120,34 @@ go
 
 
 
-
-
 ------------
 -- Course table Procedures
 
 --1)
-CREATE PROCEDURE UpdateCourse  @ID INT , @CurseName nvarchar(50)
+ALTER PROCEDURE UpdateCourse  @ID INT , @CurseName nvarchar(50)
+
   AS
-    BEGIN
+  if not exists ( select ID from Course where ID= @ID)
+  print 'error'	
+  else
+   BEGIN
      UPDATE Course 
      SET Name =@CurseName
      WHERE ID = @ID
     END
 	go
 --2)
-CREATE PROCEDURE DeleteCourse @ID INT
+ALTER PROCEDURE DeleteCourse @ID INT
   AS
+   if not exists ( select ID from Course where ID= @ID)
+  print 'error'	
+  ELSE 
 	BEGIN
 	   DELETE FROM Course WHERE ID = @ID 
 	END
-	go
+	GO
 
+	
 --3)
 CREATE PROCEDURE InsertCourse  @Crs_Name nvarchar(50) , @Crs_Duration int  
 AS
@@ -152,8 +158,12 @@ AS
 	go
 
 --4)
-CREATE PROCEDURE SelectCourse @id int
+ALTER PROCEDURE SelectCourse @id int
 AS
+if not exists ( select ID from Course where ID= @id)
+  print 'error'	
+  ELSE
+
   BEGIN
 	SELECT * FROM Course WHERE ID = @id
 
@@ -162,7 +172,7 @@ AS
 
 
 
-
+  
 
 
 
@@ -177,8 +187,11 @@ AS
 ------------------------------------------------------------------------------------------------
 --Question table Procedures
 --1)
-CREATE PROCEDURE UpdateQuestion  @ID INT  , @body varchar(200) 
+ALTER PROCEDURE UpdateQuestion  @ID INT  , @body varchar(200) 
   AS
+  if not exists ( select ID from Question where ID= @ID)
+  print 'error'	
+  ELSE 
     BEGIN
      UPDATE Question 
      SET Body = @body
@@ -187,8 +200,11 @@ CREATE PROCEDURE UpdateQuestion  @ID INT  , @body varchar(200)
 	go
 
 --2)
-CREATE PROCEDURE DeleteQuestion @ID INT
+ALTER PROCEDURE DeleteQuestion @ID INT
   AS
+   if not exists ( select ID from Question where ID= @ID)
+  print 'error'	
+  ELSE
 	BEGIN
 	   DELETE FROM Question WHERE ID = @ID 
 	END
@@ -196,7 +212,7 @@ CREATE PROCEDURE DeleteQuestion @ID INT
 
 --3)
 
-CREATE PROCEDURE InsertQuestion   @type varchar(20), @body varchar(200), @modelanswer nchar(1) , @grade int  , @course int 
+ALTER PROCEDURE InsertQuestion   @type varchar(20), @body varchar(200), @modelanswer nchar(1) , @grade int  , @course int 
 AS
 	BEGIN
 			insert into Question 
@@ -206,8 +222,11 @@ go
 
 --4)
 
-CREATE PROCEDURE SelectQuestion @id int
+ALTER PROCEDURE SelectQuestion @id int
 AS
+ if not exists ( select ID from Question where ID= @id)
+  print 'error'	
+  ELSE
   BEGIN
 	SELECT * FROM Question WHERE ID = @id
 
@@ -231,9 +250,13 @@ AS
 --Topic  table Procedures
 
 --1)
-CREATE PROCEDURE UpdateTopic  @ID INT  , @Name  nvarchar(20) 
+ALTER PROCEDURE UpdateTopic  @ID INT  , @Name  nvarchar(20) 
   AS
+   if not exists ( select ID from Topic where ID= @id)
+  print 'error'	
+  ELSE
     BEGIN
+
      UPDATE Topic 
      SET Name = @Name
      WHERE ID = @ID
@@ -241,8 +264,11 @@ CREATE PROCEDURE UpdateTopic  @ID INT  , @Name  nvarchar(20)
 	go
 
 --2)
-CREATE PROCEDURE DeleteTopic @ID INT
+ALTER PROCEDURE DeleteTopic @ID INT
   AS
+   if not exists ( select ID from Topic where ID= @ID)
+  print 'error'	
+  ELSE
 	BEGIN
 	   DELETE FROM Topic WHERE ID = @ID 
 	END
@@ -250,7 +276,7 @@ CREATE PROCEDURE DeleteTopic @ID INT
 
 --3)
 
-CREATE PROCEDURE InsertTopic   @name nvarchar(20) , @course int  
+ALTER PROCEDURE InsertTopic   @name nvarchar(20) , @course int  
 AS
 	BEGIN
 			insert into Topic 
@@ -260,8 +286,11 @@ go
 
 --4)
 
-create PROCEDURE SelectTopic  @id int
+ALTER PROCEDURE SelectTopic  @id int
 AS
+ if not exists ( select ID from Topic where ID= @id)
+  print 'error'	
+  ELSE
   BEGIN
 	SELECT * FROM Topic WHERE ID = @id
 
@@ -270,8 +299,11 @@ AS
 ---------------------------------------------------------
 --StudentCourse  table Procedures
 --1)
-create PROCEDURE UpdateSudentCourse  @Student INT , @Course int , @Grade  int
+CREATE PROCEDURE UpdateSudentCourse  @Student INT , @Course int , @Grade  int
   AS
+  if not exists ( select Grade from StudentCourses WHERE Student = @Student and Course = @Course)
+  print 'error'	
+  ELSE
     BEGIN
      UPDATE StudentCourses 
      SET Grade = @Grade
@@ -280,8 +312,11 @@ create PROCEDURE UpdateSudentCourse  @Student INT , @Course int , @Grade  int
 	go
 
 --2)
-CREATE PROCEDURE DeleteStudentCourses  @Student INT , @course int
+ALTER PROCEDURE DeleteStudentCourses  @Student INT , @course int
   AS
+  if not exists ( select Grade from StudentCourses WHERE Student = @Student and Course = @Course)
+  print 'error'	
+  ELSE
 	BEGIN
 	   DELETE FROM StudentCourses WHERE Student = @Student and Course = @course
 	END
@@ -299,14 +334,16 @@ go
 
 --4)
 
-create PROCEDURE SelectStudentCourses  @Student int , @Course int 
+ALTER PROCEDURE SelectStudentCourses  @Student int , @Course int 
 AS
+if not exists ( select Grade from StudentCourses WHERE Student = @Student and Course = @Course)
+  print 'error'	
+  ELSE
   BEGIN
 	SELECT * FROM StudentCourses WHERE Student = @Student and  Course = @Course
 
   END
   go
-
 
 
 
