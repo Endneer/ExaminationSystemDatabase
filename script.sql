@@ -390,7 +390,7 @@ go
 create procedure DeleteDepartment (@department int)
 as
 begin
-if exists(select * from student where Department=@department)and exists(select * from Instructor where Department=@department)
+if exists(select * from student where Department=@department) or exists(select * from Instructor where Department=@department)
 print 'can not delete'
 else 
 delete from Department where ID=@department
