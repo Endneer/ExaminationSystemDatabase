@@ -470,6 +470,27 @@ insert into Student values
 	('Amgad', 'Rady', 'October', 2),
 	('John', 'Emad', 'Cairo', 2),
 	('Ahmed', 'Adel', 'Giza', 1)
+
+insert into Question values
+	('MCQ', 'Which of the following statements is correct about the C#.NET code snippet given below?
+
+int a = 10; 
+int b = 20; 
+int c = 30;
+enum color: byte
+{
+    red = a, 
+    green = b,
+    blue = c 
+}
+A.	Variables cannot be assigned to enum elements.
+B.	Variables can be assigned to any one of the enum elements.
+C.	Variables can be assigned only to the first enum element.
+D.	Values assigned to enum elements must always be successive values.
+E.	Values assigned to enum elements must always begin with 0.', 'A', 2, 1),
+	('TrueOrFalse', 'A function can return more than one value.', 'F', 1, 1),
+	('TrueOrFalse', 'In C#, a function needs to be defined using the static keyword, so that it can be called from the Main function.', 'T', 1, 1)
+
 go
 
 
