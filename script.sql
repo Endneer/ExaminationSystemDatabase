@@ -1,4 +1,4 @@
---done: Question, Course, Student, Topic, StudentCourse, Department, StudentAnswers
+--done: Question, Course, Student, Topic, StudentCourse, Department, StudentAnswers, Exam, ExamQuestions
 
 create database PROJECT
 go
@@ -442,9 +442,81 @@ begin
 delete from StudentAnswers where Student=@student and Question=@question and Exam=@exam
 end
 go
+-----------
 
 
 
+
+
+
+
+
+
+
+
+
+
+--------------
+----Exam
+
+create procedure SelectExam @ID int
+as 
+select * from Exam where ID = @ID
+go
+
+create procedure DeleteExam @ID int
+as
+delete from exam where ID = @ID
+go
+
+create procedure UpdateExam @ID int 
+as select 'Can''t update Exam'
+go
+
+create procedure InsertExam
+as
+insert into Exam default values
+go
+---------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------
+----ExamQuestions
+create procedure SelectExamQuestion @ExamID int
+as
+select * from ExamQuestions where Exam = @ExamID
+go
+
+create procedure UpdateExamQuestion @ExamID int, @QuestionID int
+as
+update ExamQuestions set Question = @QuestionID where Exam = @ExamID
+go
+
+create procedure DeleteExamQuestion @ExamID int, @QuestionID int
+as
+delete from ExamQuestions where Exam = @ExamID and Question = @QuestionID
+go
+
+create procedure InsertExamQuestion @ExamID int, @QuestionID int
+as
+insert into ExamQuestions values (@ExamID, @QuestionID)
+go
 
 
 
@@ -470,6 +542,7 @@ insert into Student values
 	('Amgad', 'Rady', 'October', 2),
 	('John', 'Emad', 'Cairo', 2),
 	('Ahmed', 'Adel', 'Giza', 1)
+
 
 insert into Question values
 	('MCQ', 'Which of the following statements is correct about the C#.NET code snippet given below?
