@@ -346,7 +346,57 @@ if not exists ( select Grade from StudentCourses WHERE Student = @Student and Co
   go
 
 
+----------------------------------------------------
+--Department Table Procedures
+--1)
 
+create procedure SelectDepartment(@id int)
+as
+begin
+
+select Name,Description,Location
+from Department
+where ID=@id
+
+end
+go
+
+--2)
+
+create procedure InsertDepartment(@name nvarchar(50),@description nvarchar(100),@location nvarchar(50))
+as
+begin
+
+insert into Department values(@name,@description,@location)
+
+end
+go
+
+--3)
+
+create procedure UpdateDepartment (@id int ,@name nvarchar(50),@description nvarchar(100),@location nvarchar(50))
+as
+begin
+if not exists(select * from Department where ID=@id)
+print 'can not update'
+else
+update Department set Description=@description,Location=@location,Name=@name
+where ID=@id
+end
+go
+
+--4)
+
+create procedure DeleteDepartment (@department int)
+as
+begin
+if exists(select * from student where Department=@department)and exists(select * from Instructor where Department=@department)
+print 'can not delete'
+else 
+delete from Department where ID=@department
+end
+
+go
 
 
 
@@ -374,28 +424,3 @@ go
 
 
 
-----------------------------------------------------
---Department Table Procedures
---1)
-
-create procedure SelectDepartment(@id int)
-as
-begin
-
-select Name,Description,Location
-from Department
-where ID=@id
-
-end
-go
-
---2)
-
-create procedure InsertDepartment(@name nvarchar(50),@description nvarchar(100),@location nvarchar(50))
-as
-begin
-
-insert into Department values(@name,@description,@location)
-
-end
-go
