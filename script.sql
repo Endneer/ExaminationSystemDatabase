@@ -1,4 +1,4 @@
---done: Question, Course, Student, Topic, StudentCourse
+--done: Question, Course, Student, Topic, StudentCourse, Department, StudentAnswers
 
 create database PROJECT
 go
