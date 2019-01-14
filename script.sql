@@ -524,11 +524,58 @@ go
 
 insert into Department values 
 	('SD', 'System Development', 'Smart Village'),
-	('Java', 'Java Technologies', 'Smart Village')
+	('Java', 'Java Technologies', 'Smart Village'),
+	('EL', 'E-Learning', 'Mansoura'),
+('MM', 'Multimedia', 'Alex'),
+('Unix', 'Unix', 'Alex'),
+('NC', 'Network', 'Cairo'),
+('EB' ,'E-Business', 'Alex')
 
 insert into Course values
 	('C#', 12),
-	('SQL', 7)
+	('SQL', 7),
+('HTML', 20),
+('C Progamming', 60),
+('OOP', 80),
+('Unix', 50),
+('Web Service', 20),
+('Java', 60),
+('Oracle', 50),
+('ASP.Net', 60),
+('Win_XP', 20),
+('Photoshop', 30)
+
+
+insert into InstructorCourses values
+(1, 1),
+(1, 2),
+(1, 3),
+(2, 4),
+(2, 5),
+(3, 1),
+(3, 6),
+(3, 7),
+(4, 2),
+(4, 3),
+(5, 8),
+(5, 9),
+(6, 5),
+(6, 6),
+(6, 9),
+(6, 10),
+(6, 11),
+(7, 8),
+(7, 9),
+(8, 1),
+(9, 2),
+(10, 3),
+(11, 8),
+(11, 9),
+(12, 10),
+(12, 11),
+(13, 3),
+(13, 4)
+
 
 insert into Topic values
 ('Events',1),
@@ -541,7 +588,75 @@ insert into Student values
 	('Muhammad', 'Osama', 'October', 1),
 	('Amgad', 'Rady', 'October', 2),
 	('John', 'Emad', 'Cairo', 2),
-	('Ahmed', 'Adel', 'Giza', 1)
+	('Ahmed', 'Adel', 'Giza', 1),
+	('Ahmed', 'Hassan', 'Cairo', 1),
+('Amr', 'Magdy', 'Cairo', 1),
+('Mona', 'Saleh', 'Cairo', 1),
+('Ahmed', 'Mohamed', 'Alex', 1),
+('Khalid', 'Moahmed', 'Alex', 1),
+('Heba', 'Farouk', 'Mansoura', 2),
+('Ali', 'Hussien', 'Cairo', 2),
+('Mohamed', 'Fars', 'Alex', 2),
+('Saly', 'Ahmed', 'Mansoura', 3),
+('Fady', 'Ali', 'Alex', 3),
+('Marwa', 'Ahmed', 'Cairo', 3),
+('Noha', 'Omar', 'Cairo', 4)
+
+
+insert into Instructor values
+('Ahmed', 'Master', NULL, 1),
+('Hany', 'Master', NULL, 1),
+('Reham', 'Master', NULL, 1),
+('Yasmin', 'PHD', NULL, 1),
+('Amany', 'PHD', NULL, 1),
+('Eman', 'Master', NULL, 1),
+('Saly', 'NULL', NULL, 1),
+('Amr', 'NULL', NULL, 3),
+('Hussien', 'NULL', NULL, 5),
+('Khalid', 'NULL', NULL, 3),
+('Salah', 'NULL', NULL, 7),
+('Adel', 'NULL', NULL, 7),
+('Fakry', 'NULL', NULL, 2),
+('Amena', 'NULL', NULL, 2),
+('Ghada', NULL, NULL ,4)
+
+insert into StudentCourses values
+(1, 1, 100),
+(2, 1, 90),
+(3, 1, 80),
+(4, 1, 70),
+(5, 1, 100),
+(6, 1, 90),
+(1, 2, 90),
+(2, 2, 90),
+(3, 2, 80),
+(4, 2, 80),
+(5, 2, 80),
+(7, 2, 60),
+(8, 2, 60),
+(9, 2, 60),
+(5, 3, 70),
+(6, 3, 70),
+(7, 3, 70),
+(10, 3, 100),
+(1, 4, 100),
+(2, 4, 100),
+(3, 4, 100),
+(4, 4, 90),
+(5, 4, 90),
+(6, 5, 80),
+(7, 6, 80),
+(8, 7, 70),
+(1, 8, 70),
+(9, 8, 90),
+(10, 8, 90),
+(2, 9, 80),
+(3, 9, 70),
+(4, 9, 70),
+(5, 9, 60),
+(1, 10, 90),
+(2, 10, 60),
+(3, 10, 60)
 
 
 insert into Question values
