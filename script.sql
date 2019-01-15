@@ -1,4 +1,4 @@
---done: Question, Course, Student, Topic, StudentCourse, Department, StudentAnswers, Exam, ExamQuestions
+--done: Question, Course, Student, Topic, StudentCourse, Department, StudentAnswers, Exam, ExamQuestions, Instructor, InstructorCourses
 
 create database PROJECT
 go
@@ -51,7 +51,7 @@ create table Question
 (
 	ID int not null identity,
 	Type nvarchar(20) check (Type in ('TrueOrFalse', 'MCQ')),
-	Body nvarchar(200),
+	Body nvarchar(max),
 	ModelAnswer nchar(1) check (ModelAnswer in('T', 'F', 'A', 'B', 'C', 'D')),
 	Grade int not null,
 	Course int not null references Course(ID),
@@ -496,6 +496,7 @@ go
 
 
 
+
 ------------
 ----ExamQuestions
 create procedure SelectExamQuestion @ExamID int
@@ -517,6 +518,128 @@ create procedure InsertExamQuestion @ExamID int, @QuestionID int
 as
 insert into ExamQuestions values (@ExamID, @QuestionID)
 go
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+--Instructor TABLE
+
+GO
+CREATE PROC InsertInstructor (@insnam nvarchar(50), @deg int, @sal money, @dept int)
+AS
+	INSERT INTO Instructor( Name, Degree, Salary, Department ) 
+	VALUES (@insnam, @deg, @sal, @dept)
+	
+
+GO
+CREATE PROC SelectInstructor
+AS
+	SELECT *
+	FROM Instructor
+
+
+
+GO
+CREATE PROC DeleteInstructor (@insid int)
+AS
+	IF @insid in (select ID from Instructor)
+	begin
+		DELETE FROM Instructor
+		WHERE ID = @insid
+	end
+
+
+GO
+CREATE PROC UpdateInstructor (@insid int, @colNam varchar(20), @val varchar(20))
+AS
+	IF @insid in (select ID from Instructor)
+	begin
+		
+			if @colNam = 'Name'
+				 update  Instructor set Name = @val where ID = @insid
+			else if @colNam = 'Degree'
+				 update  Instructor set Degree = @val where ID = @insid
+			else if @colNam = 'salary'
+				 update  Instructor set Salary = CONVERT(money, @val) where ID = @insid
+				
+		End
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+---------------------------------------------------------------------------
+--InstructorCourses TABLE
+
+GO
+CREATE PROC InsertInstructorCourses (@insid int, @crs int)
+AS
+	IF (@insid in (select ID from Instructor)) and (@crs in (select ID from Course))
+	begin
+		INSERT INTO InstructorCourses
+		VALUES (@insid, @crs)
+	end
+	
+	
+
+GO
+CREATE PROC SelectInstructorCourses
+AS
+	SELECT *
+	FROM InstructorCourses
+
+
+GO
+CREATE PROC DeleteInstructorCourses (@insid int, @crs int)
+AS
+	DELETE FROM InstructorCourses
+	WHERE Instructor = @insid and Course = @crs
+
+
+GO
+CREATE PROC UpdateInstructorCourses (@insid int, @colNam varchar(20), @val varchar(20))
+AS
+	IF @insid in (select Instructor from InstructorCourses) and (@val in (select ID from Course))
+	begin
+		EXECUTE ('Update InstructorCourses Set ' + @colNam + ' = ' + @val + ' Where ID = ' + @insid)
+	end
+
+	go
+
+
+
+
+
+
+
+
+
 
 
 
@@ -544,6 +667,23 @@ insert into Course values
 ('ASP.Net', 60),
 ('Win_XP', 20),
 ('Photoshop', 30)
+
+insert into Instructor values
+('Ahmed', 'Master', NULL, 1),
+('Hany', 'Master', NULL, 1),
+('Reham', 'Master', NULL, 1),
+('Yasmin', 'PHD', NULL, 1),
+('Amany', 'PHD', NULL, 1),
+('Eman', 'Master', NULL, 1),
+('Saly', 'NULL', NULL, 1),
+('Amr', 'NULL', NULL, 3),
+('Hussien', 'NULL', NULL, 5),
+('Khalid', 'NULL', NULL, 3),
+('Salah', 'NULL', NULL, 7),
+('Adel', 'NULL', NULL, 7),
+('Fakry', 'NULL', NULL, 2),
+('Amena', 'NULL', NULL, 2),
+('Ghada', NULL, NULL ,4)
 
 
 insert into InstructorCourses values
@@ -603,22 +743,7 @@ insert into Student values
 ('Noha', 'Omar', 'Cairo', 4)
 
 
-insert into Instructor values
-('Ahmed', 'Master', NULL, 1),
-('Hany', 'Master', NULL, 1),
-('Reham', 'Master', NULL, 1),
-('Yasmin', 'PHD', NULL, 1),
-('Amany', 'PHD', NULL, 1),
-('Eman', 'Master', NULL, 1),
-('Saly', 'NULL', NULL, 1),
-('Amr', 'NULL', NULL, 3),
-('Hussien', 'NULL', NULL, 5),
-('Khalid', 'NULL', NULL, 3),
-('Salah', 'NULL', NULL, 7),
-('Adel', 'NULL', NULL, 7),
-('Fakry', 'NULL', NULL, 2),
-('Amena', 'NULL', NULL, 2),
-('Ghada', NULL, NULL ,4)
+
 
 insert into StudentCourses values
 (1, 1, 100),
