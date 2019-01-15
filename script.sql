@@ -333,5 +333,32 @@ insert into Student values
 	('Amgad', 'Rady', 'October', 2),
 	('John', 'Emad', 'Cairo', 2),
 	('Ahmed', 'Adel', 'Giza', 1)
+go
 
 
+
+----------------------------------------------------
+--Department Table Procedures
+--1)
+
+create procedure SelectDepartment(@id int)
+as
+begin
+
+select Name,Description,Location
+from Department
+where ID=@id
+
+end
+go
+
+--2)
+
+create procedure InsertDepartment(@name nvarchar(50),@description nvarchar(100),@location nvarchar(50))
+as
+begin
+
+insert into Department values(@name,@description,@location)
+
+end
+go
