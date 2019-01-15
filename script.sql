@@ -643,6 +643,101 @@ AS
 
 
 
+
+
+
+
+
+
+
+
+--------------------------------------------------------------
+--ahmed adel
+	--•	Report that returns the students information according to Department No parameter.
+
+create proc StudentInformation @X INT 
+as
+select Student.ID , FirstName ,LastName , Address , Department
+from Student inner join Department 
+on Department.ID = Student.ID 
+where Department.ID = @X 
+
+go
+
+
+go
+--	Report that takes the student ID and returns the grades of the student in all courses.
+
+create proc StudentGrades @ID int
+as
+select Name , Grade 
+from StudentCourses inner join Course
+on Course.ID = StudentCourses.Course
+where Student = @ID 
+go
+
+go
+--•	Report that takes the instructor ID and returns the name of the courses that he teaches
+--  and the number of student per course.
+go
+create proc InstructorCourses @ID INT
+as 
+select Name , COUNT(Student)
+from Course inner join InstructorCourses
+on InstructorCourses.Course = Course.ID inner join StudentCourses
+on StudentCourses.Course=Course.ID
+where InstructorCourses.Instructor =@ID
+group by Name
+go
+
+go
+
+-- Report that takes course ID and returns its topics   
+create proc CourseTopics @ID INT
+as 
+select Topic.Name
+from Topic inner join Course
+on Course.ID = Topic.Course 
+where Course.ID = @ID   
+
+go
+
+go
+--•	Report that takes exam number and returns the Questions in it
+
+create proc QuestionsExam @num INT 
+as
+select body
+from Question inner join ExamQuestions 
+on ExamQuestions.Question = Question.ID
+where ExamQuestions.Exam = @num
+ 
+go 
+
+
+go 
+ --•	Report that takes exam number and the student ID then 
+ --    returns the Questions in this exam with the student answers.
+
+create proc Questions_AnswersExam @num INT , @ID INT 
+as
+select body , ModelAnswer
+from StudentAnswers inner join Question 
+on StudentAnswers.Question =Question.ID 
+where StudentAnswers.Student = @ID AND StudentAnswers.Exam = @num 
+
+go
+
+
+
+
+
+
+
+
+
+
+
 ----Some inserts
 
 insert into Department values 
