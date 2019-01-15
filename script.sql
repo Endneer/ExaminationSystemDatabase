@@ -334,4 +334,4 @@ insert into Student values
 	('John', 'Emad', 'Cairo', 2),
 	('Ahmed', 'Adel', 'Giza', 1)
 
-select * from Student
+
