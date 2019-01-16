@@ -1,9 +1,9 @@
 --done: Question, Course, Student, Topic, StudentCourse, Department, StudentAnswers, Exam, ExamQuestions, Instructor, InstructorCourses
 
-create database PROJECT
+create database EXAMDB
 go
 
-use PROJECT
+use EXAMDB
 
 create table Department
 (
@@ -684,7 +684,7 @@ go
 --•	Report that takes the instructor ID and returns the name of the courses that he teaches
 --  and the number of student per course.
 go
-create proc InstructorCourses @ID INT
+create proc GetInstructorCourses @ID INT
 as 
 select Name , COUNT(Student)
 from Course inner join InstructorCourses
@@ -762,7 +762,7 @@ declare @exam int = SCOPE_IDENTITY()
 
  insert into ExamQuestions select top(@mcq) @exam,ID from Question where Course=@course and Type = 'MCQ' order by NEWID()
 
-select body,Type,ID,ROW_NUMBER() over ( order by Type desc ) as rank from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID
+select body,Type,Question.ID,ROW_NUMBER() over ( order by Type desc ) as rank from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID
 
 end
 go
@@ -800,12 +800,11 @@ go
 create procedure CorrectExam (@student int,@exam int)
 as
 select sum(Grade) from Question inner join StudentAnswers on ID=Question where Answer=ModelAnswer
-
+go
 
 
 
 -------
-
 
 
 
@@ -1208,5 +1207,6 @@ B.False' , 'F' ,1,2),
 A.True
 B.False' , 'F' ,1,2)
 go
+
 
 
