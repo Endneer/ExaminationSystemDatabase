@@ -762,12 +762,10 @@ declare @exam int = SCOPE_IDENTITY()
 
  insert into ExamQuestions select top(@mcq) @exam,ID from Question where Course=@course and Type = 'MCQ' order by NEWID()
 
-select body,Type,Question.ID,ROW_NUMBER() over ( order by Type desc ) as rank from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID
+select body,Type,Question.ID,Grade,ROW_NUMBER() over ( order by Type desc ) as rank from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID where Exam = @exam
 
 end
 go
-
-
 
 
 
@@ -797,11 +795,23 @@ go
 
 ----------------------------
 --exam correction
-create procedure CorrectExam (@student int,@exam int)
+create procedure CorrectExam (@exam int,@student int)
 as
-select sum(Grade) from Question inner join StudentAnswers on ID=Question where Answer=ModelAnswer
-go
+begin
+declare @x int 
+select Answer, ModelAnswer,case
+	when Answer = ModelAnswer then Question.Grade
+	else 0
+end as StudentGrade
+from StudentAnswers, Question where ID = Question and Exam = @exam and Student = @student
+union all
+select '','',sum (case
+	when Answer = ModelAnswer then Question.Grade
+	else 0
+end)
+from StudentAnswers, Question where ID = Question and Exam = @exam and Student = @student
 
+end
 
 
 -------
@@ -1208,5 +1218,8 @@ A.True
 B.False' , 'F' ,1,2)
 go
 
+
+
+-------------------------
 
 
