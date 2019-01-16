@@ -466,7 +466,11 @@ go
 
 create procedure DeleteExam @ID int
 as
+begin
+delete from StudentAnswers where Exam=@ID
+delete from ExamQuestions where Exam=@ID
 delete from exam where ID = @ID
+end
 go
 
 create procedure UpdateExam @ID int 
@@ -727,6 +731,90 @@ on StudentAnswers.Question =Question.ID
 where StudentAnswers.Student = @ID AND StudentAnswers.Exam = @num 
 
 go
+-----------------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+------------------
+--john
+---needs modification for exam identity
+----------------------------------------------------
+--Exam Generation
+
+create procedure GenerateExam (@course int , @mcq int, @trueOrFalse int)
+as
+begin
+
+insert into Exam default values
+declare @exam int = SCOPE_IDENTITY()
+ 
+ insert into ExamQuestions select top(@trueOrFalse) @exam,ID from Question where Course=@course and type ='TrueOrFalse' order by NEWID()
+
+ insert into ExamQuestions select top(@mcq) @exam,ID from Question where Course=@course and Type = 'MCQ' order by NEWID()
+
+select body,Type,ID,ROW_NUMBER() over ( order by Type desc ) as rank from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID
+
+end
+go
+
+
+
+
+
+
+
+----------------
+--answer exam
+create procedure AnswerExam (@exam int,@student int , @answers nvarchar(50))
+as
+begin
+
+select body,Type,ID,ROW_NUMBER() over ( order by Type desc) as rank into #TempQuestion from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID
+declare @tab table (answer nchar(1), rankk int identity)
+insert into @tab select *from string_split(@answers,',')
+insert into StudentAnswers select  @student, @exam, ID, answer from #TempQuestion inner join @tab on rank=rankk
+drop table #TempQuestion
+
+end
+go
+
+
+
+
+
+
+
+
+----------------------------
+--exam correction
+create procedure CorrectExam (@student int,@exam int)
+as
+select sum(Grade) from Question inner join StudentAnswers on ID=Question where Answer=ModelAnswer
+
+
+
+
+-------
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -899,6 +987,226 @@ E.	Values assigned to enum elements must always begin with 0.', 'A', 2, 1),
 	('TrueOrFalse', 'A function can return more than one value.', 'F', 1, 1),
 	('TrueOrFalse', 'In C#, a function needs to be defined using the static keyword, so that it can be called from the Main function.', 'T', 1, 1)
 
+
+
+insert into Question(Type, Body, ModelAnswer, Grade, course)
+values
+	('MCQ', 'Which of the following variable types can be assigned a value directly in C#?
+A) Value types
+B) Reference types
+C) Pointer types
+D) All of the above.','A', 2, 1),
+	('MCQ', 'Which of the following converts a type to a signed byte type in C#?
+A) ToInt64
+B) ToSbyte
+C) ToSingle
+D) ToInt32','B', 2, 1),
+	('MCQ', 'Which of the following operator returns the type of a class in C#?
+A) sizeof
+B) typeof
+C) &</a>
+D) *','B', 2, 1),
+	('MCQ', 'Which of the following access specifier in C# allows a class to hide its member variables and member functions from other functions and objects?
+A) Public
+B) Private
+C) Protected
+D) Internal','B', 2, 1),
+	('MCQ', 'Which of the following property of Array class in C# gets the rank (number of dimensions) of the Array?
+A) Rank
+B) LongLength
+C) Length
+D) None of the above.','A', 2, 1),
+	('MCQ', 'Which of the following is true about C# enumeration?
+A) An enumerated type is declared using the enum keyword.
+B) C# enumerations are value data type.
+C) Enumeration contains its own values and cannot inherit or cannot pass inheritance.
+D) All of the above.','D', 2, 1),
+	('MCQ', 'Which of the following preprocessor directive lets you modify the compiler''s line number and (optionally) the file name output for errors and warnings in C#?
+A) elif
+B) endif
+C) line
+D) region','C', 2, 1),
+	('MCQ', 'Which of the following is true about catch block in C#?
+A) A program catches an exception with an exception handler at the place in a program where you want to handle the problem.
+B) The catch keyword indicates the catching of an exception.
+C) Both of the above.
+D) None of the above.','C', 2, 1),
+	('MCQ', 'Which of the following statements is correct?
+A) Procedural Programming paradigm is different than structured programming paradigm.
+B) Object Oriented Programming paradigm stresses on dividing the logic into smaller parts and writing procedures for each part.
+C) Classes and objects are corner stones of structured programming paradigm.
+D) Object Oriented Programming paradigm gives equal importance to data and the procedures that work on the data.','D', 2, 1),
+	('MCQ', 'Which of the following statements is correct about classes and objects in C#.NET?
+A) Class is a value type.
+B) Since objects are typically big in size, they are created on the stack.
+C) Objects of smaller size are created on the heap.
+D) Objects are always nameless.','D', 2, 1),
+	('MCQ', 'Which of the following statements is incorrect about delegate?
+A) Delegates are reference types.
+B) Delegates are object oriented.
+C) Delegates serve the same purpose as function pointers in C and pointers to member function operators in C++.
+D) Only one method can be called using a delegate.','D', 2, 1),
+	('MCQ', 'Which of the following is the necessary condition for implementing delegates?
+A) Class declaration
+B) Inheritance
+C) Run-time Polymorphism
+D) Exceptions','A', 2, 1),
+--true or false
+('TrueOrFalse', 'Value type variables in C# are derived from the class System.ValueType?','T', 1, 1),
+('TrueOrFalse', 'The conditional logical operators can be overloaded.','F', 1, 1),
+('TrueOrFalse', 'A function can return more than one value.','F', 1, 1),
+('TrueOrFalse', 'In C#, a function needs to be defined using the static keyword, so that it can be called from the Main function.','T', 1, 2),
+('TrueOrFalse', 'If a function returns no value, the return type must be declared as void.','T', 1, 2),
+('TrueOrFalse', 'In a function, The return statement is not required if the return type is anything other than void.','F', 1, 2),
+('TrueOrFalse', 'A local variable declared in a function is not usable out side that function.','T', 1, 2),
+('TrueOrFalse', 'A constructor of structure is used to initialize the variables of the structure.','T', 1, 2),
+('TrueOrFalse', 'The new keyword can be used to create an object of a structure.','T', 1, 2),
+('TrueOrFalse', 'A constructor of structure can have different name from the structure.','F', 1, 2),
+('TrueOrFalse', 'The break command is used to exit a loop','T', 1, 2),
+('TrueOrFalse', 'When an array is partially initialized, the rest of its elements will automatically be set to zero.','F', 1, 2),
+('TrueOrFalse', 'The new keyword can be used to allocate spaces for an array.','T', 1, 2),
+('TrueOrFalse', 'A two-dimensional array represents data in the form of table with rows and columns.','T', 1, 2)
+----------------
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+-----
+--sql questions
+--- amgad
+-- insert MCQ questions SQL
+insert into Question
+ values('MCQ','Which statement is wrong about PRIMARY KEY constraint in SQL?
+A)	The PRIMARY KEY uniquely identifies each record in a SQL database table
+B)	Primary key can be made based on multiple columns
+C)	Primary key must be made of any single columns
+D)	Primary keys must contain UNIQUE values.' , 'C' ,2,2),
+  
+   ('MCQ' , 'Which is/are correct statements about primary key of a table?
+A)	Primary keys can contain NULL values
+B)	Primary keys can contain NULL values.
+C)	A table can have only one primary key with single or multiple fields
+D)	A table can have multiple primary keys with single or multiple fields' ,'C',2,2 ),
+
+   ('MCQ' , 'In existing table, ALTER TABLE statement is used to
+A.	Add columns
+B.	Add constraints
+C.	Delete columns
+D.	All of the above
+' ,'D',2,2 ),
+
+  ('MCQ' , 'SQL Query to delete all rows in a table without deleting the table (structure, attributes, and indexes)
+A.	DELETE FROM table_name;
+B.	DELETE TABLE table_name;
+C.	DROP TABLE table_name;
+D.	NONE
+' ,'A',2,2 ),
+  ('MCQ' , 'Wrong statement about UPDATE keyword is
+A.	If WHERE clause in missing in statement the all records will be updated.
+B.	Only one record can be updated at a time using WHERE clause
+C.	Multiple records can be updated at a time using WHERE clause
+D.	None is wrong statement' , 'B',2,2),
+
+  ('MCQ' , 'Wrong statement about ORDER BY keyword is
+A.	Used to sort the result-set in ascending or descending order
+B.	The ORDER BY keyword sorts the records in ascending order by default.
+C.	To sort the records in ascending order, use the ASC keyword.
+D.	To sort the records in descending order, use the DECENDING keyword.' , 'D',2,2),
+
+         
+  ('MCQ' , 'Correct syntax query syntax to drop a column from a table is
+A.	DELETE COLUMN column_name;
+B.	DROP COLUMN column_name;
+C.	ALTER TABLE table_name DROP COLUMN column_name;
+D.	None is correct.' , 'C',2,2),
+
+  ('MCQ' , 'If you want to allow age of a person > 18 in the column Age of table Person, then which constraint will be applied to AGE column.
+A.	Default
+B.	Check
+C.	NOT NULL
+D.	None' , 'B',2,2),
+
+
+ ('MCQ' , 'In a table, a column contains duplicate value, if you want to list all different value only, then which SQL clause is used?
+A.	SQL DISTINCT
+B.	SQL UNIQUE
+C.	SQL BETWEEN
+D.	SQL Exists' , 'B',2,2),
+
+
+ ('MCQ' , 'To give a temporary name to a table, or a column in a table for more readability, what is used?
+A.	SQL Wildcards
+B.	SQL aliases
+C.	SQL LIKES
+D.	SQL Comments' , 'B',2,2)
+
+-- insert true false questions SQL
+
+
+insert into Question
+ values('TrueOrFalse','The condition in a WHERE clause can refer to only one value.
+A.True
+B.False' , 'F' ,1,2),
+
+('TrueOrFalse','The ADD command is used to enter one row of data or to add multiple rows as a result of a query.
+A.True
+B.False' , 'F' ,1,2),
+
+('TrueOrFalse','SQL provides the AS keyword, which can be used to assign meaningful column names to the results of queries using the SQL built-in functions.
+A.True
+B.False' , 'T' ,1,2),
+
+('TrueOrFalse','The SELECT command, with its various clauses, allows users to query the data contained in the tables and ask many different questions or ad hoc queries.
+A.True
+B.False' , 'T' ,1,2),
+
+('TrueOrFalse','A SELECT statement within another SELECT statement and enclosed in square brackets ([...]) is called a subquery.
+A.True
+B.False' , 'F' ,1,2),
+
+('TrueOrFalse','The rows of the result relation produced by a SELECT statement can be sorted, but only by one column.
+A.True
+B.False' , 'F' ,1,2),
+
+('TrueOrFalse','There is an equivalent join expression that can be substituted for all subquery expressions.
+A.True
+B.False' , 'F' ,1,2),
+
+('TrueOrFalse','A dynamic view is one whose contents materialize when referenced.
+A.True
+B.False' , 'T' ,1,2),
+
+('TrueOrFalse','SQL is a programming language.
+A.True
+B.False' , 'F' ,1,2),
+
+('TrueOrFalse','SELECT DISTINCT is used if a user wishes to see duplicate columns in a query.
+A.True
+B.False' , 'F' ,1,2)
 go
 
 
