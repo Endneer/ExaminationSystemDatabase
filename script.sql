@@ -785,10 +785,10 @@ drop table #TempQuestion
 declare @course int
 select @course = Course from Question,ExamQuestions where ID = Question and Exam = @exam
 declare @sumGrades int
-select @sumGrades = sum(ExamGrade) from StudentExams where Student = @student and @exam in 
+select @sumGrades = sum(ExamGrade) from StudentExams where Student = @student and @exam in
 (
 select e.ID from Exam e, ExamQuestions eq, Question q, Course c where
-e.ID = eq.Exam and eq.Question = q.ID and q.Course = c.ID group by e.ID
+e.ID = eq.Exam and eq.Question = q.ID and q.Course = c.ID and c.ID = @course group by e.ID
 )
 update StudentCourses set Grade = @sumGrades where Student = @student and Course = @course
 end
@@ -1261,3 +1261,4 @@ select * from StudentExams
 select * from StudentCourses
 
 */
+
