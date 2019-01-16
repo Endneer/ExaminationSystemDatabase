@@ -1,9 +1,9 @@
 --done: Question, Course, Student, Topic, StudentCourse, Department, StudentAnswers, Exam, ExamQuestions, Instructor, InstructorCourses
 
-create database EXAMDB
+create database EXAMDB5
 go
 
-use EXAMDB
+use EXAMDB5
 
 create table Department
 (
@@ -782,7 +782,15 @@ declare @tab table (answer nchar(1), rankk int identity)
 insert into @tab select *from string_split(@answers,',')
 insert into StudentAnswers select  @student, @exam, ID, answer from #TempQuestion inner join @tab on rank=rankk
 drop table #TempQuestion
-
+declare @course int
+select @course = Course from Question,ExamQuestions where ID = Question and Exam = @exam
+declare @sumGrades int
+select @sumGrades = sum(ExamGrade) from StudentExams where Student = @student and @exam in 
+(
+select e.ID from Exam e, ExamQuestions eq, Question q, Course c where
+e.ID = eq.Exam and eq.Question = q.ID and q.Course = c.ID group by e.ID
+)
+update StudentCourses set Grade = @sumGrades where Student = @student and Course = @course
 end
 go
 
@@ -813,13 +821,18 @@ from StudentAnswers, Question where ID = Question and Exam = @exam and Student =
 
 end
 
-
+go
 -------
 
-
-
-
-
+create view StudentExams 
+as
+--(select Student,Exam from StudentAnswers group by Student, Exam)
+select Student, Exam, sum(case
+	when Answer = ModelAnswer then Grade
+	else 0
+end) as ExamGrade
+from StudentAnswers inner join Question on Question=ID group by Student,Exam
+go
 
 
 
@@ -938,42 +951,42 @@ insert into Student values
 
 
 insert into StudentCourses values
-(1, 1, 100),
-(2, 1, 90),
-(3, 1, 80),
-(4, 1, 70),
-(5, 1, 100),
-(6, 1, 90),
-(1, 2, 90),
-(2, 2, 90),
-(3, 2, 80),
-(4, 2, 80),
-(5, 2, 80),
-(7, 2, 60),
-(8, 2, 60),
-(9, 2, 60),
-(5, 3, 70),
-(6, 3, 70),
-(7, 3, 70),
-(10, 3, 100),
-(1, 4, 100),
-(2, 4, 100),
-(3, 4, 100),
-(4, 4, 90),
-(5, 4, 90),
-(6, 5, 80),
-(7, 6, 80),
-(8, 7, 70),
-(1, 8, 70),
-(9, 8, 90),
-(10, 8, 90),
-(2, 9, 80),
-(3, 9, 70),
-(4, 9, 70),
-(5, 9, 60),
-(1, 10, 90),
-(2, 10, 60),
-(3, 10, 60)
+(1, 1, null),
+(2, 1, null),
+(3, 1, null),
+(4, 1, null),
+(5, 1, null),
+(6, 1, null),
+(1, 2, null),
+(2, 2, null),
+(3, 2, null),
+(4, 2, null),
+(5, 2, null),
+(7, 2, null),
+(8, 2, null),
+(9, 2, null),
+(5, 3, null),
+(6, 3, null),
+(7, 3, null),
+(10, 3, null),
+(1, 4, null),
+(2, 4, null),
+(3, 4, null),
+(4, 4, null),
+(5, 4, null),
+(6, 5, null),
+(7, 6, null),
+(8, 7, null),
+(1, 8, null),
+(9, 8, null),
+(10, 8, null),
+(2, 9, null),
+(3, 9, null),
+(4, 9, null),
+(5, 9, null),
+(1, 10, null),
+(2, 10, null),
+(3, 10, null)
 
 
 insert into Question values
@@ -1221,5 +1234,30 @@ go
 
 
 -------------------------
+/*
+
+generateexam 1,3,7
+generateexam 2,3,7
 
 
+
+SELECT * FROM StudentAnswers
+
+CORRECTEXAM 1,3
+
+answerexam 1,2,'T,F,T,A,B,C,D,A,B,C,D,A'
+answerexam 1,1,'T,F,T,A,B,C,D,A,B,C,D,A'
+answerexam 1,3,'F,T,F,A,B,C,D,A,B,C,D,A'
+
+answerexam 2,2,'T,F,T,A,B,C,D,A,B,C,D,A'
+answerexam 2,1,'T,F,T,A,B,C,D,A,B,C,D,A'
+answerexam 2,3,'F,T,F,A,B,C,D,A,B,C,D,A'
+
+
+answerexam 3,2,'F,T,F,A,B,C,D,A,B,C,D,A'
+
+select * from StudentExams
+
+select * from StudentCourses
+
+*/
