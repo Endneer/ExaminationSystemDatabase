@@ -82,7 +82,7 @@ create table StudentAnswers
 	Student int not null references Student(ID),
 	Exam int not null references Exam(ID),
 	Question int not null references Question(ID),
-	Answer nchar(1) check (Answer in('T', 'F', 'A', 'B', 'C', 'D')),
+	Answer nchar(1) check (Answer in('T', 'F', 'A', 'B', 'C', 'D', 'E')),
 	primary key(Student, Exam, Question)
 )
 
@@ -751,19 +751,21 @@ go
 ----------------------------------------------------
 --Exam Generation
 
+
 create procedure GenerateExam (@course int , @mcq int, @trueOrFalse int)
 as
 begin
-
-insert into Exam default values
-declare @exam int = SCOPE_IDENTITY()
+	if @mcq >= 0 and @trueOrFalse >=0 and @course in (select ID from Course)
+	begin
+		insert into Exam default values
+		declare @exam int = SCOPE_IDENTITY()
  
- insert into ExamQuestions select top(@trueOrFalse) @exam,ID from Question where Course=@course and type ='TrueOrFalse' order by NEWID()
+		 insert into ExamQuestions select top(@trueOrFalse) @exam,ID from Question where Course=@course and type ='TrueOrFalse' order by NEWID()
 
- insert into ExamQuestions select top(@mcq) @exam,ID from Question where Course=@course and Type = 'MCQ' order by NEWID()
+		 insert into ExamQuestions select top(@mcq) @exam,ID from Question where Course=@course and Type = 'MCQ' order by NEWID()
 
-select body,Type,Question.ID,Grade,ROW_NUMBER() over ( order by Type desc ) as rank from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID where Exam = @exam
-
+		select body,Type,Question.ID,ROW_NUMBER() over ( order by Type desc ) as rank from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID and Exam=@exam
+	end
 end
 go
 
@@ -774,14 +776,17 @@ go
 ----------------
 --answer exam
 create procedure AnswerExam (@exam int,@student int , @answers nvarchar(50))
-as
+as begin 
+if @EXAM IN (select id from Exam) and @student in (select id from Student)
 begin
 
-select body,Type,ID,ROW_NUMBER() over ( order by Type desc) as rank into #TempQuestion from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID
+select body,Type,ID,ROW_NUMBER() over ( order by Type desc) as rank into #TempQuestion from ExamQuestions inner join Question on ExamQuestions.Question = Question.ID where @exam = ExamQuestions.Exam
 declare @tab table (answer nchar(1), rankk int identity)
 insert into @tab select *from string_split(@answers,',')
-insert into StudentAnswers select  @student, @exam, ID, answer from #TempQuestion inner join @tab on rank=rankk
+insert into StudentAnswers select  @student, @exam, ID, answer from #TempQuestion left outer join @tab on rank=rankk
 drop table #TempQuestion
+
+
 declare @course int
 select @course = Course from Question,ExamQuestions where ID = Question and Exam = @exam
 declare @sumGrades int
@@ -792,8 +797,8 @@ e.ID = eq.Exam and eq.Question = q.ID and q.Course = c.ID and c.ID = @course gro
 )
 update StudentCourses set Grade = @sumGrades where Student = @student and Course = @course
 end
+end
 go
-
 
 
 
@@ -807,17 +812,21 @@ create procedure CorrectExam (@exam int,@student int)
 as
 begin
 declare @x int 
-select Answer, ModelAnswer,case
+select Answer, ModelAnswer,StudentGrade from (
+
+select Type as tp, Answer, ModelAnswer,case
 	when Answer = ModelAnswer then Question.Grade
 	else 0
 end as StudentGrade
-from StudentAnswers, Question where ID = Question and Exam = @exam and Student = @student
+from StudentAnswers, Question where ID = Question and Exam = @exam and Student = @student 
 union all
-select '','',sum (case
+select '' as tp,'' as Answer,'' as ModelAnswer,sum (case
 	when Answer = ModelAnswer then Question.Grade
 	else 0
-end)
-from StudentAnswers, Question where ID = Question and Exam = @exam and Student = @student
+end) as StudentGrade
+from StudentAnswers, Question where ID = Question and Exam = @exam and Student = @student 
+)as t
+order by t.tp desc
 
 end
 
